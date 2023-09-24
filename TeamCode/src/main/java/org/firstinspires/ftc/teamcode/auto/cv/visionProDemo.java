@@ -11,20 +11,19 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
-import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @TeleOp
 public class visionProDemo extends LinearOpMode {
-    OpenCvCamera camera;
-    aprilTagPipeline aprilTagDetectionPipeline;
-
     static final double FEET_PER_METER = 3.28084;
 
     // Lens intrinsics
@@ -59,6 +58,7 @@ public class visionProDemo extends LinearOpMode {
         AprilTagProcessor myAprilTagProcessor;
 
         myAprilTagProcessor = new AprilTagProcessor.Builder() // Create a new AprilTag Processor Builder object.
+                .setLensIntrinsics(fx, fy, cx, cy) //Since C270 1280x720 webcam is not among the resolutions the SDK knows of, we need to provide it w/ the calibration info.
                 .setDrawTagID(true) // Default: true, for all detections.
                 .setDrawTagOutline(true) // Default: true, when tag size was provided (thus eligible for pose estimation).
                 .setDrawAxes(true) // Default: false.
@@ -83,29 +83,11 @@ public class visionProDemo extends LinearOpMode {
                 .addProcessors(myAprilTagProcessor, myTfodProcessor) // Add the AprilTag Processor to the VisionPortal Builder.
                 .setCameraResolution(new Size(1280, 720)) // Each resolution, for each camera model, needs calibration values for good pose estimation.
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2) // MJPEG format uses less bandwidth than the default YUY2.
-                .enableLiveView(true) // Enable LiveView (RC preview).
+                .enableLiveView(true) // Enable LiveView (RC preview).  I believe we don't need this because we use the Driver Hub Camera Stream, not an RC phone.
                 .setAutoStopLiveView(true) // Automatically stop LiveView (RC preview) when all vision processors are disabled.
-                .build(); // Create a VisionPortal by calling build()
+                .build(); // Create a VisionPortal by calling build().  The camera starts streaming.
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        aprilTagDetectionPipeline = new aprilTagPipeline(tagsize, fx, fy, cx, cy);
-
-        camera.setPipeline(aprilTagDetectionPipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
-            @Override
-            public void onOpened()
-            {
-                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
-            }
-
-            @Override
-            public void onError(int errorCode)
-            {
-
-            }
-        });
+        //May have to set camera rotation to UPRIGHT (defaulted to SENSOR_NATIVE)
 
         waitForStart();
 
@@ -117,17 +99,23 @@ public class visionProDemo extends LinearOpMode {
             // processed since the last time we called it. Otherwise, it will return null. This
             // enables us to only run logic when there has been a new frame, as opposed to the
             // getLatestDetections() method which will always return an object.
-            ArrayList<AprilTagDetection> detections = aprilTagDetectionPipeline.getDetectionsUpdate();
+//            ArrayList<AprilTagDetection> detections = aprilTagDetectionPipeline.getDetectionsUpdate();
+
+            List<org.firstinspires.ftc.vision.apriltag.AprilTagDetection> myAprilTagDetections;  // list of all detections
+            int myAprilTagIdCode;                           // ID code of current detection, in for() loop
+
+// Get a list of AprilTag detections.
+            myAprilTagDetections = myAprilTagProcessor.getDetections();
 
             // If there's been a new frame...
-            if(detections != null)
+            if(myAprilTagDetections != null)
             {
-                telemetry.addData("FPS", camera.getFps());
-                telemetry.addData("Overhead ms", camera.getOverheadTimeMs());
-                telemetry.addData("Pipeline ms", camera.getPipelineTimeMs());
+                telemetry.addData("FPS", myVisionPortal.getFps());
+//                telemetry.addData("Overhead ms", camera.getOverheadTimeMs());
+//                telemetry.addData("Pipeline ms", camera.getPipelineTimeMs());
 
                 // If we don't see any tags
-                if(detections.size() == 0)
+                if(myAprilTagDetections.size() == 0)
                 {
                     numFramesWithoutDetection++;
 
@@ -135,8 +123,10 @@ public class visionProDemo extends LinearOpMode {
                     // so we can hopefully pick one up if we're e.g. far back
                     if(numFramesWithoutDetection >= THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION)
                     {
-                        aprilTagDetectionPipeline.setDecimation(DECIMATION_LOW);
+                        myAprilTagProcessor.setDecimation(DECIMATION_LOW);
+//                        telemetry.addLine("Must lower decimation on the VisionPortal pipeline");
                     }
+
                 }
                 // We do see tags!
                 else
@@ -145,22 +135,29 @@ public class visionProDemo extends LinearOpMode {
 
                     // If the target is within 1 meter, turn on high decimation to
                     // increase the frame rate
-                    if(detections.get(0).pose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS)
+                    if(myAprilTagDetections.get(0).ftcPose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS)
                     {
-                        aprilTagDetectionPipeline.setDecimation(DECIMATION_HIGH);
+                        myAprilTagProcessor.setDecimation(DECIMATION_HIGH);
                     }
 
-                    for(AprilTagDetection detection : detections)
+                    for(AprilTagDetection detection : myAprilTagDetections)
                     {
-                        Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
-
+//                        if (detection.metadata != null) {  // This check for non-null Metadata is not needed for reading only ID code.
+//                            myAprilTagIdCode = detection.id;
+//
+//                            // Now take action based on this tag's ID code, or store info for later action.
+//
+//                        }
+                        //Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+                        telemetry.addData("Camera Streaming?", myVisionPortal.getCameraState());
                         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-                        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-                        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-                        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
-                        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
-                        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", rot.secondAngle));
-                        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
+                        telemetry.addLine(String.format("Translation X: %.2f feet", detection.ftcPose.x*FEET_PER_METER));
+                        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.ftcPose.y*FEET_PER_METER));
+                        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.ftcPose.z*FEET_PER_METER));
+                        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", detection.ftcPose.yaw));
+                        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", detection.ftcPose.pitch));
+                        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", detection.ftcPose.roll
+                        ));
                     }
                 }
 
