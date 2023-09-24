@@ -1,25 +1,6 @@
-/*
- * Copyright (c) 2021 OpenFTC Team
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.firstinspires.ftc.teamcode.auto.cv;
+
+import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -29,19 +10,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.auto.cv.aprilTagPipeline;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
-import org.openftc.easyopencv.OpenCvInternalCamera2;
 
 import java.util.ArrayList;
 
 @TeleOp
-public class AprilTagDemo extends LinearOpMode
-{
+public class visionProDemo extends LinearOpMode {
     OpenCvCamera camera;
     aprilTagPipeline aprilTagDetectionPipeline;
 
@@ -51,10 +31,16 @@ public class AprilTagDemo extends LinearOpMode
     // UNITS ARE PIXELS
     // NOTE: this calibration is for the C920 webcam at 800x448.
     // You will need to do your own calibration for other configurations!
-    double fx = 578.272;
-    double fy = 578.272;
-    double cx = 402.145;
-    double cy = 221.506;
+//    double fx = 578.272;
+//    double fy = 578.272;
+//    double cx = 402.145;
+//    double cy = 221.506;
+
+    //The following is the calibration for the C270 Webcam at 1280x720.
+    double fx = 1553.14;
+    double fy = 1553.14;
+    double cx = 507.111;
+    double cy = 363.954;
 
     // UNITS ARE METERS
     double tagsize = 0.166;
@@ -69,6 +55,38 @@ public class AprilTagDemo extends LinearOpMode
     @Override
     public void runOpMode()
     {
+        AprilTagProcessor.Builder myAprilTagProcessorBuilder;
+        AprilTagProcessor myAprilTagProcessor;
+
+        myAprilTagProcessor = new AprilTagProcessor.Builder() // Create a new AprilTag Processor Builder object.
+                .setDrawTagID(true) // Default: true, for all detections.
+                .setDrawTagOutline(true) // Default: true, when tag size was provided (thus eligible for pose estimation).
+                .setDrawAxes(true) // Default: false.
+                .setDrawCubeProjection(true) // Default: false.
+                .build(); // Create an AprilTagProcessor by calling build()
+
+        // Optional: specify a custom Library of AprilTags.
+//        myAprilTagProcessorBuilder.setTagLibrary(myAprilTagLibrary);   // The OpMode must have already created a Library
+
+        TfodProcessor myTfodProcessor;
+        myTfodProcessor = new TfodProcessor.Builder() // Create a new TFOD Processor Builder object.
+                .setMaxNumRecognitions(10) // Max. number of recognitions the network will return
+                .setUseObjectTracker(true) // Whether to use the object tracker
+                .setTrackerMaxOverlap((float) 0.2) // Max. % of box overlapped by another box at recognition time
+                .setTrackerMinSize(16) // Min. size of object that the object tracker will track
+                .build(); // Create a TFOD Processor by calling build()
+
+        VisionPortal myVisionPortal;
+
+        myVisionPortal = new VisionPortal.Builder() // Create a new VisionPortal Builder object.
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1")) // Specify the camera to be used for this VisionPortal.
+                .addProcessors(myAprilTagProcessor, myTfodProcessor) // Add the AprilTag Processor to the VisionPortal Builder.
+                .setCameraResolution(new Size(1280, 720)) // Each resolution, for each camera model, needs calibration values for good pose estimation.
+                .setStreamFormat(VisionPortal.StreamFormat.YUY2) // MJPEG format uses less bandwidth than the default YUY2.
+                .enableLiveView(true) // Enable LiveView (RC preview).
+                .setAutoStopLiveView(true) // Automatically stop LiveView (RC preview) when all vision processors are disabled.
+                .build(); // Create a VisionPortal by calling build()
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new aprilTagPipeline(tagsize, fx, fy, cx, cy);
