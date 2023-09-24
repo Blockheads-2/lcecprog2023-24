@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
@@ -21,6 +22,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 import java.util.List;
+
+//demo apriltags found on APrilTag Test Images in the ftc-docs.firstinspires.org
 
 @TeleOp
 public class visionProDemo extends LinearOpMode {
@@ -58,6 +61,7 @@ public class visionProDemo extends LinearOpMode {
         AprilTagProcessor myAprilTagProcessor;
 
         myAprilTagProcessor = new AprilTagProcessor.Builder() // Create a new AprilTag Processor Builder object.
+                .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary()) //sets the AprilTagLibrary to the current season. You can add your own custom AprilTags as well (refer to AprilTag Library under the FIRST FTC Docs)
                 .setLensIntrinsics(fx, fy, cx, cy) //Since C270 1280x720 webcam is not among the resolutions the SDK knows of, we need to provide it w/ the calibration info.
                 .setDrawTagID(true) // Default: true, for all detections.
                 .setDrawTagOutline(true) // Default: true, when tag size was provided (thus eligible for pose estimation).
@@ -88,6 +92,38 @@ public class visionProDemo extends LinearOpMode {
                 .build(); // Create a VisionPortal by calling build().  The camera starts streaming.
 
         //May have to set camera rotation to UPRIGHT (defaulted to SENSOR_NATIVE)
+
+        //CPU CONSERVATION
+        //LEVEL ONE
+//        myVisionPortal.stopLiveView(); //temporarily sops the live view (RC preview). This should be fine as we don't use an RC phone.
+//        myVisionPortal.resumeLiveView();
+
+        //LEVEL TWO
+// Enable or disable the AprilTag processor.
+//        myVisionPortal.setProcessorEnabled(myAprilTagProcessor, false);
+// Enable or disable the TensorFlow Object Detection processor.
+//        myVisionPortal.setProcessorEnabled(myTfodProcessor, false);
+
+        //LEVEL THREE
+// Temporarily stop the streaming session. This can save CPU
+// resources, with the ability to resume quickly when needed.
+//        myVisionPortal.stopStreaming();
+// Resume the streaming session if previously stopped.
+//        myVisionPortal.resumeStreaming();
+
+        //LEVEL FOUR
+//        myVisionPortal.close(); //called automatically at the end of any OpMode.
+
+        //look into:
+        /*
+set decimation (down-sampling) (we already do this)
+
+select a pose solver algorithm
+
+get all or only fresh detections from the AprilTag Processor
+
+get all or only fresh recognitions from the TFOD Processor
+         */
 
         waitForStart();
 
@@ -156,8 +192,10 @@ public class visionProDemo extends LinearOpMode {
                         telemetry.addLine(String.format("Translation Z: %.2f feet", detection.ftcPose.z*FEET_PER_METER));
                         telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", detection.ftcPose.yaw));
                         telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", detection.ftcPose.pitch));
-                        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", detection.ftcPose.roll
-                        ));
+                        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", detection.ftcPose.roll));
+                        telemetry.addLine(String.format("Range (distance to tag center): %.2f degrees", detection.ftcPose.range));
+                        telemetry.addLine(String.format("Bearing (delta yaw from apriltag center): %.2f degrees", detection.ftcPose.bearing));
+                        telemetry.addLine(String.format("Elevation (delta pitch from apriltag center): %.2f degrees", detection.ftcPose.elevation));
                     }
                 }
 
