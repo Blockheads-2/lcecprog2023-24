@@ -20,4 +20,5 @@ public class Constants {
     //Camera Constants
     public static float WIDTH = 1280.0f;
     public static float HEIGHT = 720.0f;
+    public static double CAMERA_ERROR = 2.0f; //typically off by ~2 inches in the y-direction.  Not sure about the x-direction.
 }

@@ -43,7 +43,7 @@ public class BaseDrive extends OpMode{
     @Override
     public void loop() {
         UpdatePlayer1();
-        UpdatePlayer2();
+//        UpdatePlayer2();
         UpdateButton();
         UpdateTelemetry();
     }
@@ -78,50 +78,50 @@ public class BaseDrive extends OpMode{
         double directionR = Math.pow(gamepad1.right_stick_x, 1); //Turn
 
 
-        robot.lf.setPower((directionY + directionR + directionX) * drivePower);
-        robot.rf.setPower((directionY - directionR - directionX) * drivePower);
-        robot.lb.setPower((directionY + directionR - directionX) * drivePower);
-        robot.rb.setPower((directionY - directionR + directionX) * drivePower);
+        robot.lf.setPower((directionY + directionR + directionX) * drivePower * 0.5);
+//        robot.rf.setPower((directionY - directionR - directionX) * drivePower);
+        robot.lb.setPower((directionY + directionR - directionX) * drivePower * 0.5);
+//        robot.rb.setPower((directionY - directionR + directionX) * drivePower);
 
     }
 
     void DriveMicroAdjust(double power){
         if (gamepad1.dpad_up){
             robot.lf.setPower(power);
-            robot.rf.setPower(power);
+//            robot.rf.setPower(power);
             robot.lb.setPower(power);
-            robot.rb.setPower(power);
+//            robot.rb.setPower(power);
         }
         else if (gamepad1.dpad_down){
             robot.lf.setPower(-power);
-            robot.rf.setPower(-power);
+//            robot.rf.setPower(-power);
             robot.lb.setPower(-power);
-            robot.rb.setPower(-power);
+//            robot.rb.setPower(-power);
         }
         else if (gamepad1.dpad_right){
             robot.lf.setPower(power);
-            robot.rf.setPower(-power);
+//            robot.rf.setPower(-power);
             robot.lb.setPower(-power);
-            robot.rb.setPower(power);
+//            robot.rb.setPower(power);
         }
         else if (gamepad1.dpad_left){
             robot.lf.setPower(-power);
-            robot.rf.setPower(power);
+//            robot.rf.setPower(power);
             robot.lb.setPower(power);
-            robot.rb.setPower(-power);
+//            robot.rb.setPower(-power);
         }
 
         if (gamepad1.left_trigger == 1){
             robot.lf.setPower(-power);
-            robot.rf.setPower(power);
+//            robot.rf.setPower(power);
             robot.lb.setPower(-power);
-            robot.rb.setPower(power);
+//            robot.rb.setPower(power);
         }
         else if (gamepad1.right_trigger == 1){
             robot.lf.setPower(power);
-            robot.rf.setPower(-power);
+//            robot.rf.setPower(-power);
             robot.lb.setPower(power);
-            robot.rb.setPower(-power);
+//            robot.rb.setPower(-power);
         }
     }
 

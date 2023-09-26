@@ -39,10 +39,25 @@ public class visionProDemo extends LinearOpMode {
 //    double cy = 221.506;
 
     //The following is the calibration for the C270 Webcam at 1280x720.
-    double fx = 1553.14;
-    double fy = 1553.14;
-    double cx = 507.111;
-    double cy = 363.954;
+    //1187 x 792 pixels
+//    double fx = 1553.14;
+//    double fy = 1553.14;
+//    double cx = 507.111;
+//    double cy = 363.954;
+
+     //2374 x 1582 pixels
+//    double fx = 3106.83;
+//    double fy = 3106.83;
+//    double cx = 1149.49;
+//    double cy = 823.886;
+
+
+    //1187 x 791 pixels
+    double fx = 1545.58;
+    double fy = 1545.58;
+    double cx = 575.169;
+    double cy = 404.893;
+
 
     // UNITS ARE METERS
     double tagsize = 0.166;
@@ -102,7 +117,7 @@ public class visionProDemo extends LinearOpMode {
 // Enable or disable the AprilTag processor.
 //        myVisionPortal.setProcessorEnabled(myAprilTagProcessor, false);
 // Enable or disable the TensorFlow Object Detection processor.
-//        myVisionPortal.setProcessorEnabled(myTfodProcessor, false);
+        myVisionPortal.setProcessorEnabled(myTfodProcessor, false);
 
         //LEVEL THREE
 // Temporarily stop the streaming session. This can save CPU
@@ -124,6 +139,9 @@ get all or only fresh detections from the AprilTag Processor
 
 get all or only fresh recognitions from the TFOD Processor
          */
+
+        telemetry.addLine("Read");
+        telemetry.update();
 
         waitForStart();
 
@@ -187,13 +205,14 @@ get all or only fresh recognitions from the TFOD Processor
                         //Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
                         telemetry.addData("Camera Streaming?", myVisionPortal.getCameraState());
                         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-                        telemetry.addLine(String.format("Translation X: %.2f feet", detection.ftcPose.x*FEET_PER_METER));
-                        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.ftcPose.y*FEET_PER_METER));
-                        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.ftcPose.z*FEET_PER_METER));
+                        telemetry.addLine(String.format("Translation X: %.2f inches", detection.ftcPose.x));
+                        telemetry.addLine(String.format("Translation Y: %.2f inches", detection.ftcPose.y));
+                        telemetry.addLine(String.format("Translation Y: %.2f inches", detection.ftcPose.y-9));
+                        telemetry.addLine(String.format("Translation Z: %.2f inches", detection.ftcPose.z));
                         telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", detection.ftcPose.yaw));
                         telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", detection.ftcPose.pitch));
                         telemetry.addLine(String.format("Rotation Roll: %.2f degrees", detection.ftcPose.roll));
-                        telemetry.addLine(String.format("Range (distance to tag center): %.2f degrees", detection.ftcPose.range));
+                        telemetry.addLine(String.format("Range (distance to tag center): %.2f inches", detection.ftcPose.range));
                         telemetry.addLine(String.format("Bearing (delta yaw from apriltag center): %.2f degrees", detection.ftcPose.bearing));
                         telemetry.addLine(String.format("Elevation (delta pitch from apriltag center): %.2f degrees", detection.ftcPose.elevation));
                     }
