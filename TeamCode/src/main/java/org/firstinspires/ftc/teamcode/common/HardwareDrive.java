@@ -49,16 +49,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  *
  * Motor channel:  Left  drive motor:        "left_drive"
  * Motor channel:  Right drive motor:        "right_drive"
- * Motor channel:  Manipulator drive motor:  "left_arm"
- * Servo channel:  Servo to open left claw:  "left_hand"
- * Servo channel:  Servo to open right claw: "right_hand"
  */
 public class HardwareDrive
 {
 
     public DcMotorEx  lf;
-//    public DcMotorEx  rf;
-//    public DcMotorEx  rb;
+    public DcMotorEx  rf;
+    public DcMotorEx  rb;
     public DcMotorEx  lb;
 
 
@@ -94,8 +91,8 @@ public class HardwareDrive
 
         lf = hwMap.get(DcMotorEx.class, "left_front");
         lb = hwMap.get(DcMotorEx.class, "left_back");
-//        rf = hwMap.get(DcMotorEx.class, "right_front");
-//        rb = hwMap.get(DcMotorEx.class, "right_back");
+        rf = hwMap.get(DcMotorEx.class, "right_front");
+        rb = hwMap.get(DcMotorEx.class, "right_back");
 
         //IMU initiation
 //        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -113,8 +110,8 @@ public class HardwareDrive
         //Set Motor Directions
         lf.setDirection(DcMotorSimple.Direction.FORWARD);
         lb.setDirection(DcMotorSimple.Direction.FORWARD);
-//        rf.setDirection(DcMotorSimple.Direction.REVERSE);
-//        rb.setDirection(DcMotorSimple.Direction.REVERSE);
+        rf.setDirection(DcMotorSimple.Direction.REVERSE);
+        rb.setDirection(DcMotorSimple.Direction.REVERSE);
        // dtMotors[2].setDirection(DcMotorSimple.Direction.FORWARD);
         //dtMotors[3].setDirection(DcMotorSimple.Direction.FORWARD);
 
@@ -123,33 +120,31 @@ public class HardwareDrive
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
-        setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-    }
+//        setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+}
 
     public void setMotorPower(double power){
         if (power == 0.0){
-            // Grady Conwell Was Here
+            // Grady Conwell Was Here and so wuos luk dabal
             lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//            rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//            rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         } else {
             lb.setPower(0);
             lf.setPower(0);
-//            rf.setPower(0);
-//            rb.setPower(0);
+            rf.setPower(0);
+            rb.setPower(0);
         }
     }
 
     public void setRunMode(DcMotor.RunMode runState){
         lb.setMode(runState);
         lf.setMode(runState);
-//        rb.setMode(runState);
-//        rf.setMode(runState);
-        //make sure to not add arm here
+        rb.setMode(runState);
+        rf.setMode(runState);
     }
 
     /*

@@ -213,12 +213,11 @@ get all or only fresh recognitions from the TFOD Processor
                         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
                         telemetry.addLine(String.format("Translation X: %.2f inches", detection.ftcPose.x));
                         telemetry.addLine(String.format("Translation Y: %.2f inches", detection.ftcPose.y));
-                        telemetry.addLine(String.format("Translation Y: %.2f inches", detection.ftcPose.y-9));
                         telemetry.addLine(String.format("Translation Z: %.2f inches", detection.ftcPose.z));
                         telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", detection.ftcPose.yaw));
                         telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", detection.ftcPose.pitch));
                         telemetry.addLine(String.format("Rotation Roll: %.2f degrees", detection.ftcPose.roll));
-                        telemetry.addLine(String.format("Range (distance to tag center): %.2f inches", detection.ftcPose.range));
+                        telemetry.addLine(String.format("Range (distance to tag center): %.2f inches", detection.ftcPose.range-3));
                         telemetry.addLine(String.format("Bearing (delta yaw from apriltag center): %.2f degrees", detection.ftcPose.bearing));
                         telemetry.addLine(String.format("Elevation (delta pitch from apriltag center): %.2f degrees", detection.ftcPose.elevation));
                     }
