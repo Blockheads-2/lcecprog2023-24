@@ -53,10 +53,16 @@ public class visionProDemo extends LinearOpMode {
 
 
     //1187 x 791 pixels
-    double fx = 1545.58;
-    double fy = 1545.58;
-    double cx = 575.169;
-    double cy = 404.893;
+//    double fx = 1545.58;
+//    double fy = 1545.58;
+//    double cx = 575.169;
+//    double cy = 404.893;
+
+    //640 x 480 pixels
+    float fx = 622.001f;
+    float fy = 622.001f;
+    float cx = 319.803f;
+    float cy = 241.251f;
 
 
     // UNITS ARE METERS
@@ -100,7 +106,7 @@ public class visionProDemo extends LinearOpMode {
         myVisionPortal = new VisionPortal.Builder() // Create a new VisionPortal Builder object.
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1")) // Specify the camera to be used for this VisionPortal.
                 .addProcessors(myAprilTagProcessor, myTfodProcessor) // Add the AprilTag Processor to the VisionPortal Builder.
-                .setCameraResolution(new Size(1280, 720)) // Each resolution, for each camera model, needs calibration values for good pose estimation.
+                .setCameraResolution(new Size(640, 480)) // Each resolution, for each camera model, needs calibration values for good pose estimation.
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2) // MJPEG format uses less bandwidth than the default YUY2.
                 .enableLiveView(true) // Enable LiveView (RC preview).  I believe we don't need this because we use the Driver Hub Camera Stream, not an RC phone.
                 .setAutoStopLiveView(true) // Automatically stop LiveView (RC preview) when all vision processors are disabled.
