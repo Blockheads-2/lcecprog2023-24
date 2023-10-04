@@ -78,9 +78,8 @@ public class BaseDrive extends OpMode{
         double directionR = Math.pow(gamepad1.right_stick_x, 1); //Turn
 
 
-        robot.lf.setPower((directionY + directionR + directionX) * drivePower * 0.5);
+        robot.lf.setPower((directionY + directionR + directionX) * drivePower);
         robot.rf.setPower((directionY - directionR - directionX) * drivePower);
-        robot.lb.setPower((directionY + directionR - directionX) * drivePower * 0.5);
         robot.rb.setPower((directionY - directionR + directionX) * drivePower);
 
     }
