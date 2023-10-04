@@ -46,19 +46,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  *
  * This hardware class assumes the following device names have been configured on the robot:
  * Note:  All names are lower case and some have single spaces between words.
- *
- * Motor channel:  Left  drive motor:        "left_drive"
- * Motor channel:  Right drive motor:        "right_drive"
- * Motor channel:  Manipulator drive motor:  "left_arm"
- * Servo channel:  Servo to open left claw:  "left_hand"
- * Servo channel:  Servo to open right claw: "right_hand"
  */
 public class HardwareDrive
 {
 
     public DcMotorEx  lf;
-//    public DcMotorEx  rf;
-//    public DcMotorEx  rb;
+    public DcMotorEx  rf;
+    public DcMotorEx  rb;
     public DcMotorEx  lb;
 
 
@@ -73,7 +67,7 @@ public class HardwareDrive
      */
 
     //imu
-//    public BNO055IMU imu; //delete if we don't use it
+    public BNO055IMU imu; //delete if we don't use it
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
@@ -94,29 +88,27 @@ public class HardwareDrive
 
         lf = hwMap.get(DcMotorEx.class, "left_front");
         lb = hwMap.get(DcMotorEx.class, "left_back");
-//        rf = hwMap.get(DcMotorEx.class, "right_front");
-//        rb = hwMap.get(DcMotorEx.class, "right_back");
+        rf = hwMap.get(DcMotorEx.class, "right_front");
+        rb = hwMap.get(DcMotorEx.class, "right_back");
 
         //IMU initiation
-//        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-//        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-//        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-//        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-//        parameters.loggingEnabled      = true;
-//        parameters.loggingTag          = "IMU";
-//        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-//        imu = hwMap.get(BNO055IMU.class, "imu");
-//        imu.initialize(parameters);
+        imu = hwMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
 
         //Set Motor Directions
         lf.setDirection(DcMotorSimple.Direction.FORWARD);
         lb.setDirection(DcMotorSimple.Direction.FORWARD);
-//        rf.setDirection(DcMotorSimple.Direction.REVERSE);
-//        rb.setDirection(DcMotorSimple.Direction.REVERSE);
-       // dtMotors[2].setDirection(DcMotorSimple.Direction.FORWARD);
-        //dtMotors[3].setDirection(DcMotorSimple.Direction.FORWARD);
+        rf.setDirection(DcMotorSimple.Direction.REVERSE);
+        rb.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Set all motors to zero power
         setMotorPower(0);
@@ -133,22 +125,22 @@ public class HardwareDrive
             // Grady Conwell Was Here
             lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//            rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//            rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         } else {
             lb.setPower(0);
             lf.setPower(0);
-//            rf.setPower(0);
-//            rb.setPower(0);
+            rf.setPower(0);
+            rb.setPower(0);
         }
     }
 
     public void setRunMode(DcMotor.RunMode runState){
         lb.setMode(runState);
         lf.setMode(runState);
-//        rb.setMode(runState);
-//        rf.setMode(runState);
+        rb.setMode(runState);
+        rf.setMode(runState);
         //make sure to not add arm here
     }
 
