@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
@@ -84,7 +85,7 @@ public class visionProDemo extends LinearOpMode {
 
         myAprilTagProcessor = new AprilTagProcessor.Builder() // Create a new AprilTag Processor Builder object.
                 .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary()) //sets the AprilTagLibrary to the current season. You can add your own custom AprilTags as well (refer to AprilTag Library under the FIRST FTC Docs)
-                .setLensIntrinsics(fx, fy, cx, cy) //Since C270 1280x720 webcam is not among the resolutions the SDK knows of, we need to provide it w/ the calibration info.
+                .setLensIntrinsics(Constants.fx, Constants.fy, Constants.cx, Constants.cy) //Since C270 1280x720 webcam is not among the resolutions the SDK knows of, we need to provide it w/ the calibration info.
                 .setDrawTagID(true) // Default: true, for all detections.
                 .setDrawTagOutline(true) // Default: true, when tag size was provided (thus eligible for pose estimation).
                 .setDrawAxes(true) // Default: false.

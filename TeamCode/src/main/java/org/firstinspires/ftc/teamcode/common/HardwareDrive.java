@@ -54,44 +54,23 @@ public class HardwareDrive
     public DcMotorEx  rf;
     public DcMotorEx  rb;
     public DcMotorEx  lb;
+    public BNO055IMU imu;
 
+    HardwareMap hwMap =  null;
+    private final ElapsedTime period  =  new ElapsedTime();
 
-//    public DcMotorEx[] dtMotors;
-
-    /*
-    Top Left  0                              Top Right 2
-
-
-    Bottom Left 1                           Bottom Right 3
-
-     */
-
-    //imu
-    public BNO055IMU imu; //delete if we don't use it
-
-    /* local OpMode members. */
-    HardwareMap hwMap           =  null;
-    private ElapsedTime period  = new ElapsedTime();
-    Constants constants = new Constants();
-
-    /* Constructor */
-    public HardwareDrive(){
-
-    }
-
-    /* Initialize standard Hardware interfaces */
     public void init(HardwareMap ahwMap) {
-        // Save reference to Hardware map
+        boolean targetFound     = false;    // Set to true when an AprilTag target is detected
+        double  drive           = 0;        // Desired forward power/speed (-1 to +1)
+        double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
+        double  turn            = 0;        // Desired turning power/speed (-1 to +1)
+
         hwMap = ahwMap;
-
-        // Define and Initialize Motors
-
         lf = hwMap.get(DcMotorEx.class, "left_front");
         lb = hwMap.get(DcMotorEx.class, "left_back");
         rf = hwMap.get(DcMotorEx.class, "right_front");
         rb = hwMap.get(DcMotorEx.class, "right_back");
 
-        //IMU initiation
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -104,17 +83,12 @@ public class HardwareDrive
         imu.initialize(parameters);
 
 
-        //Set Motor Directions
         lf.setDirection(DcMotorSimple.Direction.FORWARD);
         lb.setDirection(DcMotorSimple.Direction.FORWARD);
         rf.setDirection(DcMotorSimple.Direction.REVERSE);
         rb.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        // Set all motors to zero power
         setMotorPower(0);
-
-        // Set all motors to run without encoders.
-        // May want to use RUN_USING_ENCODERS if encoders are installed.
         setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -122,7 +96,6 @@ public class HardwareDrive
 
     public void setMotorPower(double power){
         if (power == 0.0){
-            // Grady Conwell Was Here
             lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -141,14 +114,6 @@ public class HardwareDrive
         lf.setMode(runState);
         rb.setMode(runState);
         rf.setMode(runState);
-        //make sure to not add arm here
     }
-
-    /*
-    public boolean wheelsAreBusy(){
-        return (dtMotors[0].isBusy() && dtMotors[1].isBusy()/* && dtMotors[2].isBusy() && dtMotors[3].isBusy());
-    }
-    */
-
 }
 
