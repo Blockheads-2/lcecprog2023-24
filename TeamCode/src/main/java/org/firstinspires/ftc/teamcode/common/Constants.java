@@ -28,6 +28,8 @@ public class Constants {
     //Distance Between swerve module and Center
     public static float DISTANCE_BETWEEN_MODULE_AND_CENTER = 3.406f; //3.405512
 
+    public static double DEFAULT_SPEED = 0.75;
+
     //Camera Constants
     public static float WIDTH = 1280.0f;
     public static float HEIGHT = 720.0f;
@@ -42,4 +44,6 @@ public class Constants {
     public static final double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     public static final double MAX_AUTO_STRAFE= 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     public static final double MAX_AUTO_TURN  = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
+    public static final double EXPOSURE_MS = 6;
+    public static final int CAMERA_GAIN = 250;
 }

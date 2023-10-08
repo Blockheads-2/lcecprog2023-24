@@ -11,11 +11,11 @@ import org.firstinspires.ftc.teamcode.common.Button;
 import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 
-@TeleOp(name="Base Drive", group="Drive")
+@TeleOp(name="Base Drive", group="Ready")
 //@Disabled
-public class BaseDrive extends OpMode{
+public class BaseDrive extends OpMode {
     /* Declare OpMode members. */
-    HardwareDrive robot = new HardwareDrive();
+    HardwareDrive robot = new HardwareDrive(telemetry);
     private ElapsedTime runtime = new ElapsedTime();
 
     /** The relativeLayout field is used to aid in providing interesting visual feedback
@@ -25,7 +25,11 @@ public class BaseDrive extends OpMode{
 
     @Override
     public void init() {
-        robot.init(hardwareMap);
+        try {
+            robot.init(hardwareMap);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         telemetry.addData("Say", "Hello Driver");
         runtime.reset();
