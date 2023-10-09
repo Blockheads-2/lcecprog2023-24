@@ -55,8 +55,6 @@ public class BaseDrive extends OpMode {
         double drivePower = DriveTrainSpeed();
 
         DriveTrainBase(drivePower);
-        DriveTrainSpeed();
-        DriveMicroAdjust(0.4);
     }
 
     void UpdatePlayer2(){
@@ -69,6 +67,11 @@ public class BaseDrive extends OpMode {
         telemetry.addData("Y", -gamepad1.left_stick_y);
         telemetry.addData("R", gamepad1.right_stick_x);
 
+        telemetry.addData("Right trigger", gamepad1.right_trigger);
+        telemetry.addData("Right bumper", gamepad1.right_bumper);
+
+        telemetry.addData("right back power", robot.rb.getPower());
+        telemetry.addData("right front power", robot.rf.getPower());
         telemetry.update();
     }
 
@@ -76,55 +79,66 @@ public class BaseDrive extends OpMode {
 
     }
 
+    double lfPower = 0;
+    double lbPower = 0;
+    double rfPower = 0;
+    double rbPower = 0;
+
     void DriveTrainBase(double drivePower){
         double directionX = Math.pow(gamepad1.left_stick_x, 1); //Strafe
         double directionY = -Math.pow(gamepad1.left_stick_y, 1); //Forward
         double directionR = Math.pow(gamepad1.right_stick_x, 1); //Turn
 
+        lfPower = (directionY + directionR + directionX) * drivePower;
+        lbPower = (directionY - directionR - directionX) * drivePower;
+        rfPower = (directionY - directionR - directionX) * drivePower;
+        rbPower = (directionY + directionR + directionX) * drivePower;
 
-        robot.lf.setPower((directionY + directionR + directionX) * drivePower);
-        robot.rf.setPower((directionY - directionR - directionX) * drivePower);
-        robot.rb.setPower((directionY - directionR + directionX) * drivePower);
+        DriveMicroAdjust(0.4);
 
+        robot.lf.setPower(lfPower);
+        robot.lb.setPower(lbPower);
+        robot.rf.setPower(rfPower);
+        robot.rb.setPower(rbPower);
     }
 
     void DriveMicroAdjust(double power){
         if (gamepad1.dpad_up){
-            robot.lf.setPower(power);
-            robot.rf.setPower(power);
-            robot.lb.setPower(power);
-            robot.rb.setPower(power);
+            lfPower = power;
+            lbPower = power;
+            rfPower = power;
+            rbPower = power;
         }
         else if (gamepad1.dpad_down){
-            robot.lf.setPower(-power);
-            robot.rf.setPower(-power);
-            robot.lb.setPower(-power);
-            robot.rb.setPower(-power);
+            lfPower = -power;
+            lbPower = -power;
+            rfPower = -power;
+            rbPower = -power;
         }
         else if (gamepad1.dpad_right){
-            robot.lf.setPower(power);
-            robot.rf.setPower(-power);
-            robot.lb.setPower(-power);
-            robot.rb.setPower(power);
+            lfPower = power;
+            lbPower = -power;
+            rfPower = -power;
+            rbPower = power;
         }
         else if (gamepad1.dpad_left){
-            robot.lf.setPower(-power);
-            robot.rf.setPower(power);
-            robot.lb.setPower(power);
-            robot.rb.setPower(-power);
+            lfPower = -power;
+            lbPower = power;
+            rfPower = power;
+            rbPower = -power;
         }
 
-        if (gamepad1.left_trigger == 1){
-            robot.lf.setPower(-power);
-            robot.rf.setPower(power);
-            robot.lb.setPower(-power);
-            robot.rb.setPower(power);
+        if (gamepad1.left_trigger != 0){
+            lfPower = -power;
+            lbPower = power;
+            rfPower = -power;
+            rbPower = power;
         }
-        else if (gamepad1.right_trigger == 1){
-            robot.lf.setPower(power);
-            robot.rf.setPower(-power);
-            robot.lb.setPower(power);
-            robot.rb.setPower(-power);
+        else if (gamepad1.right_trigger != 0){
+            lfPower = power;
+            lbPower = -power;
+            rfPower = power;
+            rbPower = -power;
         }
     }
 
